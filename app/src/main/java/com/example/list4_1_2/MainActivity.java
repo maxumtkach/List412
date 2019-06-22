@@ -6,18 +6,17 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
@@ -45,12 +44,12 @@ public class MainActivity extends AppCompatActivity {
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                shareEdit();
-                mSwipeRefreshLayout.setRefreshing(false);
+                refreshList();
+                mSwipeRefreshLayout.setColorSchemeResources
+                        (R.color.light_blue, R.color.middle_blue, R.color.deep_blue);
             }
         });
 
-      //  initViews();
         values = prepareContent();
         from = new String[]{ATTRIBUTE_TITLE_TEXT, ATTRIBUTE_SUBTITLE_TEXT};
         //массив данных
@@ -63,6 +62,20 @@ public class MainActivity extends AppCompatActivity {
         listContentAdapter = createAdapter();
         listView.setAdapter(listContentAdapter);
         registerForContextMenu(listView);
+    }
+
+
+    public void refreshList() {
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                shareEdit();
+                //Останавливаем обновление:
+                mSwipeRefreshLayout.setRefreshing(false)
+                ;
+            }
+        }, 5000);
     }
 
     private void shareEdit() {
@@ -90,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
     private void initViews() { //инициализация
         listView = findViewById(R.id.listView_text_1);
         textView = findViewById(R.id.textView_text_1);
-        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swiperefresh);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);
     }
 
     private SimpleAdapter createAdapter() {
@@ -101,7 +114,6 @@ public class MainActivity extends AppCompatActivity {
     private String[] prepareContent() {
         return getString(R.string.large_text).split("\n\n");
     }
-
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,
