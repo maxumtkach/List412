@@ -18,6 +18,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         initViews();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -66,16 +68,23 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void refreshList() {
-
+        mSwipeRefreshLayout.setRefreshing(true);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                shareEdit();
+
                 //Останавливаем обновление:
-                mSwipeRefreshLayout.setRefreshing(false)
-                ;
+                mSwipeRefreshLayout.setRefreshing(false);
+                shareEdit();
+
+                int min = 0;
+                int max = 100;
+                Random random = new Random();
+                int i = random.nextInt((max - min + 1) + min);
+                textView = findViewById(R.id.textView);
+                textView.setText(String.valueOf(i));
             }
-        }, 5000);
+        }, 3000);
     }
 
     private void shareEdit() {
@@ -101,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initViews() { //инициализация
+
         listView = findViewById(R.id.listView_text_1);
         textView = findViewById(R.id.textView_text_1);
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipeRefresh);

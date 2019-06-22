@@ -6,4 +6,6 @@
     <color name="light_blue">#AFEEEE</color>
     <color name="middle_blue">#6495ED</color>
     <color name="deep_blue">#0000FF</color>
+    <color name="color_text">#E91E63</color>
+
 </resources>
