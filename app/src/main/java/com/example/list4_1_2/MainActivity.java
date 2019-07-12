@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,8 @@ public class MainActivity extends AppCompatActivity {
     TextView textView;
     String[] values;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private ArrayList<Integer> integerArrayList = new ArrayList<>();  //лист для инд. удаления
+    int m;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +67,26 @@ public class MainActivity extends AppCompatActivity {
         listContentAdapter = createAdapter();
         listView.setAdapter(listContentAdapter);
         registerForContextMenu(listView);
+
+        if (savedInstanceState == null) {
+            Toast.makeText(this, "onCreate TEXT_VIEW is NULL", Toast.LENGTH_LONG).show();
+        } else {
+            integerArrayList = savedInstanceState.getIntegerArrayList(LARGE_TEXT);  //восстановление сост.
+
+            for ( m = 0; m <= integerArrayList.size(); m++) {
+                data.remove(m);
+
+            }
+            listContentAdapter.notifyDataSetChanged();
+        }
     }
 
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putIntegerArrayList(LARGE_TEXT, integerArrayList);   //сохранение листа эл. удаления
+    }
 
     public void refreshList() {
         mSwipeRefreshLayout.setRefreshing(true);
@@ -139,6 +160,9 @@ public class MainActivity extends AppCompatActivity {
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             // удаляем Map из коллекции, используя позицию пункта в списке
             data.remove(acmi.position);
+
+            integerArrayList.add(acmi.position);     //  добавление инекса удал. элемента
+
             // уведомляем, что данные изменились
             listContentAdapter.notifyDataSetChanged();
             return true;
