@@ -73,8 +73,9 @@ public class MainActivity extends AppCompatActivity {
         } else {
             integerArrayList = savedInstanceState.getIntegerArrayList(LARGE_TEXT);  //восстановление сост.
 
-            for ( m = 0; m <= integerArrayList.size(); m++) {
-                data.remove(m);
+            assert integerArrayList != null;
+            for (m = 0; m <= integerArrayList.size(); m++) {
+                data.remove(integerArrayList.get(m));
 
             }
             listContentAdapter.notifyDataSetChanged();
