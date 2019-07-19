@@ -23,21 +23,26 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    ListView listView;
+    private ListView listView;
     private String[] from;
     private final String ATTRIBUTE_TITLE_TEXT = "title";
     private final String ATTRIBUTE_SUBTITLE_TEXT = "subtitle";
     int[] to = {R.id.textView_text_1, R.id.textView_text_2};
     private static final int CM_DELETE_ID = 1;
     SimpleAdapter listContentAdapter;
-    ArrayList<Map<String, Object>> data;
+
+    private ArrayList<Map<String, Object>> data;
     SharedPreferences sharedPreferences;
-    private final String LARGE_TEXT = "large text";
-    TextView textView;
-    String[] values;
+    private static final String PREFS_FILE = "Account";//---------------------------
+
+    private static final String LARGE_TEXT = "large text";//--------------------------------
+    private final static String MY_KEY = "my key";
+    private TextView textView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private ArrayList<Integer> integerArrayList = new ArrayList<>();  //лист для инд. удаления
-    int m;
+
+    private ArrayList<Integer> integerArrayList = new ArrayList<>();  //лист для инд. удаления -------------------------------
+    int n;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,38 +60,35 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        values = prepareContent();
+        String[] values = prepareContent();
         from = new String[]{ATTRIBUTE_TITLE_TEXT, ATTRIBUTE_SUBTITLE_TEXT};
         //массив данных
         addData(values);
 
-        sharedPreferences = getSharedPreferences(LARGE_TEXT, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(PREFS_FILE, Context.MODE_PRIVATE);
 
         shareEdit();
 
         listContentAdapter = createAdapter();
         listView.setAdapter(listContentAdapter);
         registerForContextMenu(listView);
-
+//---------------------------------------------------------------------------------------------------------------------
         if (savedInstanceState == null) {
             Toast.makeText(this, "onCreate TEXT_VIEW is NULL", Toast.LENGTH_LONG).show();
         } else {
-            integerArrayList = savedInstanceState.getIntegerArrayList(LARGE_TEXT);  //восстановление сост.
-
+            integerArrayList = savedInstanceState.getIntegerArrayList(MY_KEY);  //восстановление сост. -----------------
             assert integerArrayList != null;
-            for (m = 0; m <= integerArrayList.size(); m++) {
-                data.remove(integerArrayList.get(m));
-
+            for (int m = 0; m < integerArrayList.size(); m++) {
+                data.remove(integerArrayList.get(m).intValue());
             }
             listContentAdapter.notifyDataSetChanged();
         }
     }
 
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putIntegerArrayList(LARGE_TEXT, integerArrayList);   //сохранение листа эл. удаления
+        outState.putIntegerArrayList(MY_KEY, integerArrayList);   //сохранение листа эл. удаления ------------------------------
     }
 
     public void refreshList() {
@@ -104,17 +106,18 @@ public class MainActivity extends AppCompatActivity {
                 Random random = new Random();
                 int i = random.nextInt((max - min + 1) + min);
                 textView = findViewById(R.id.textView);
-                textView.setText(String.valueOf(i));
+                textView.setText(String.valueOf(i) + "\n" + n + "\n" + integerArrayList);
             }
         }, 3000);
     }
 
-    private void shareEdit() {
+    private void shareEdit() {//-----------------------------------------------------------------------------------------------------
         if (sharedPreferences.contains(getString(R.string.large_text))) {
             textView.setText(sharedPreferences.getString(LARGE_TEXT, ""));
         } else {
             SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(LARGE_TEXT, values.toString());
+            editor.putString(LARGE_TEXT, String.valueOf(R.string.large_text));
+            editor.apply();
         }
     }
 
@@ -160,9 +163,10 @@ public class MainActivity extends AppCompatActivity {
             // получаем инфу о пункте списка
             AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
             // удаляем Map из коллекции, используя позицию пункта в списке
+            n = acmi.position; // индекс удаляемого элем.  -----------------------------------
             data.remove(acmi.position);
 
-            integerArrayList.add(acmi.position);     //  добавление инекса удал. элемента
+            integerArrayList.add(acmi.position);     //  добавление инекса удал. элемента  --------------------------------
 
             // уведомляем, что данные изменились
             listContentAdapter.notifyDataSetChanged();
