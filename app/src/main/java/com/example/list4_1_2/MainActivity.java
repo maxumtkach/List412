@@ -41,14 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
     private ArrayList<Integer> integerArrayList = new ArrayList<>();  //лист для инд. удаления -------------------------------
-    int n;
-
+    private int n;
+    AdapterView.AdapterContextMenuInfo acmi;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         initViews();
 
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -74,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
         registerForContextMenu(listView);
 //---------------------------------------------------------------------------------------------------------------------
         if (savedInstanceState == null) {
-            Toast.makeText(this, "onCreate TEXT_VIEW is NULL", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.text_view_null), Toast.LENGTH_LONG).show();
         } else {
             integerArrayList = savedInstanceState.getIntegerArrayList(MY_KEY);  //восстановление сост. -----------------
             assert integerArrayList != null;
@@ -83,6 +82,21 @@ public class MainActivity extends AppCompatActivity {
             }
             listContentAdapter.notifyDataSetChanged();
         }
+        removePos();
+    }
+
+    private void removePos() { // удаляем эл.
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final int deletePosition = position;
+
+                Toast.makeText(MainActivity.this, (R.string.remove), Toast.LENGTH_LONG).show();
+                data.remove(deletePosition);
+                integerArrayList.add(deletePosition);     //  добавление инекса удал. элемента  --------------------------------
+                listContentAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -154,14 +168,16 @@ public class MainActivity extends AppCompatActivity {
     public void onCreateContextMenu(ContextMenu menu, View v,
                                     ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CM_DELETE_ID, 0, "Удалить запись");
+        menu.add(0, CM_DELETE_ID, 0, (R.string.delete_text));
     }
 
     @Override
-    public boolean onContextItemSelected(MenuItem item) {
+    public boolean onContextItemSelected(final MenuItem item) {
+
         if (item.getItemId() == CM_DELETE_ID) {
             // получаем инфу о пункте списка
-            AdapterView.AdapterContextMenuInfo acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+            acmi = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+
             // удаляем Map из коллекции, используя позицию пункта в списке
             n = acmi.position; // индекс удаляемого элем.  -----------------------------------
             data.remove(acmi.position);
@@ -172,6 +188,7 @@ public class MainActivity extends AppCompatActivity {
             listContentAdapter.notifyDataSetChanged();
             return true;
         }
+
         return super.onContextItemSelected(item);
     }
 }

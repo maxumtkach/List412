@@ -89,4 +89,7 @@
         "For example, position the FAB to one side of stream of a cards so the FAB won’t interfere "
         "when a user tries to pick up one of cards.\n\n"
     </string>
+    <string name="delete_text">Удалить запись</string>
+    <string name="remove">remove</string>
+    <string name="text_view_null">onCreate TEXT_VIEW is NULL</string>
 </resources>
